@@ -1,0 +1,116 @@
+<!doctype html>
+<html>
+<head>
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
+<script>
+
+const KEY_LEFT = 37;
+const KEY_RIGHT = 39;
+const KEY_ESC = 27;
+const KEY_SPACE = 32;
+
+const STATE_END = 0x00;
+const STATE_NORMAL = 0x01;
+
+var screen_w = 10;
+var screen_h = 6;
+var screen_mx = new Array(screen_w * screen_h);
+var ship_x = Math.floor(screen_w >> 1);
+
+var step_delay = 500;
+var game_state = STATE_NORMAL;
+var render_frequency = 100;
+
+var stat_survive = 0;
+var stat_kill = 0;
+
+jQuery(function(){
+  jQuery('body').keydown(function(event){
+    switch (event.keyCode) {
+      case KEY_LEFT:
+        ship_x > 0 ? ship_x-- : null;
+        break;
+      case KEY_RIGHT:
+        ship_x < screen_w - 1 ? ship_x++ : null;
+        break;
+      case KEY_SPACE:
+        shoot();
+        break;
+      case KEY_ESC:
+        end();
+        break;
+    }
+  });
+
+  step();
+  setInterval(render, render_frequency);
+});
+
+function step() {
+  for (var i = 0; i < screen_w; i++) {
+    if (screen_mx[screen_w * (screen_h - 1) + i]) {
+      stat_survive++;
+    }
+  }
+
+  for (var i = screen_h * screen_w - 1; i >= 0; i--) {
+    screen_mx[i] = screen_mx[i - screen_w];
+  }
+
+  for (var i = 0; i < screen_w; i++) {
+    screen_mx[i] = Math.random() > 0.95 ? true : false;
+  }
+
+  if (game_state ^ STATE_END) {
+    setTimeout(step, step_delay);
+  }
+}
+
+function end() {
+  game_state = STATE_END;
+}
+
+function render() {
+  var output = '';
+  for (var i = 0; i < (screen_w * screen_h); i++) {
+    output = output + (i && i % screen_w == 0 ? "\n" : '');
+    output = output + (screen_mx[i] ? 'O' : ' ');
+  }
+
+  output = output + "\n";
+  for (var i = 0; i < screen_w; i++) {
+    output = output + (i == ship_x ? 'A' : ' ');
+  }
+
+  jQuery('#map').text(output);
+
+  jQuery('#score').text('Killed: ' + stat_kill + ' Missed: ' + stat_survive);
+}
+
+function shoot() {
+  var row = screen_h - 1;
+  var kill_flag = false;
+  while (!kill_flag && row >= 0) {
+    if (screen_mx[row * screen_w + ship_x]) {
+      kill_flag = true;
+      screen_mx[row * screen_w + ship_x] = false;
+      stat_kill++;
+    }
+    row--;
+  }
+}
+
+</script>
+</head>
+<body>
+
+  <div>
+    <pre id="map"></pre>
+  </div>
+
+  <div>
+    <pre id="score"></pre>
+  </div>
+
+</body>
+</html>
