@@ -1,0 +1,37 @@
+body {
+  background-color: #024;
+  color: #8be;
+  margin: 0;
+}
+
+div {
+  text-align: center;
+}
+
+pre {
+  font-size: 2em;
+  margin: 0;
+}
+
+#ship,
+#map {
+  background-color: black;
+  color: white;
+}
+
+#ship {
+  color: red;
+}
+
+#title,
+#score {
+  background-color: #012;
+  padding: 12px;
+  border-top: 1px solid #036;
+  border-bottom: 1px solid #036;
+}
+
+small {
+  margin-top: 32px;
+  color: #456;
+}
